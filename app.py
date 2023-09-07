@@ -59,7 +59,7 @@ def init_page() -> None:
     st.sidebar.title("Options")
     icon, title = st.columns([3, 20])
     with icon:
-        st.image('./docs/image.png')
+        st.image('./img/image.png')
     with title:
         st.title('Finance Chatbot')
     st.session_state['db_active'] = False
