@@ -18,4 +18,5 @@ sqlalchemy
 pyscopg2
 openpyxl
 pypdf
+tabulate
 
