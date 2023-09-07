@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+__init__.py
+
+# Virtual Environment
+venv/
+env/
+.venv/
+pip-log.txt
+
+# IDE/Editor specific
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Compiled files
+*.pyc
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Streamlit specific
+__pycache__/
+.streamlit/secrets.toml
+.streamlit/config.toml
+
+#directories
+docs/
+temp/
