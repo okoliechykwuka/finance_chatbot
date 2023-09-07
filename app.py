@@ -1,3 +1,7 @@
+__import__('pysqlite3')
+import sys
+sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+
 from agents.SQLagent import build_sql_agent, sql_as_tool
 from agents.csv_chat import build_csv_agent, csv_as_tool
 from utils.utility import ExcelLoader
