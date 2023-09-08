@@ -473,7 +473,7 @@ def main() -> None:
         for cost in costs:
             st.sidebar.markdown(f"- ${cost:.5f}")
     except openai.error.AuthenticationError as e:
-        "Incorrect API key provided: sk-AqXgf***************************************8lPi. You can find your API key at https://platform.openai.com/account/api-keys"
+        st.warning("Incorrect API key provided: You can find your API key at https://platform.openai.com/account/api-keys")
     except openai.error.RateLimitError:
         st.warning('OpenAI RateLimit: Your API Key has probably exceeded the maximum requests per min or per day')
 
