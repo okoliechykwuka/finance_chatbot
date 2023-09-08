@@ -1,12 +1,11 @@
 __import__('pysqlite3')
 import sys
 sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-
+import langchain
 from agents.SQLagent import build_sql_agent, sql_as_tool
 from agents.csv_chat import build_csv_agent, csv_as_tool
 from utils.utility import ExcelLoader
 # app.py
-import openai
 from typing import List, Union, Optional
 from langchain.document_loaders import PyPDFLoader, TextLoader
 from langchain.llms import OpenAI
@@ -366,68 +365,69 @@ def extract_userquesion_part_only(content):
 
 
 def main() -> None:
-
+    import openai
     init_page()
-    open_ai_key()
-    if 'history' not in st.session_state:
-        st.session_state['history'] = []
-    
-    model_name, temperature, chain_mode = select_llm()
-    embeddings = load_embeddings(model_name)
-    files = get_csv_file()
-    paths, texts, chroma = None, None, None
-
-    if chain_mode == 'Database':
-        try:
-            if st.session_state['db_active']:
-                llm_chain, llm = st.session_state['models']
-            else:
-                llm_chain, llm = get_db_credentials(model_name=model_name, temperature=temperature,
-                                                chain_mode=chain_mode)
-        except KeyError:
-            st.sidebar.warning('Provide a Database Log in Details')
-            llm_chain, llm = None, None
-
-    elif files is not None:
-        for fp in files:
-            if fp[0] == 'csv':
-                paths = fp[1]
-            elif fp[0] == 'docs':
-                texts = fp[1]
-        if texts:
-            import openai
-            try:
-                chroma = build_vectore_store(texts, embeddings)
-            except openai.error.AuthenticationError:
-                st.echo('Invalid OPENAI API KEY')
+    try:
+        open_ai_key()
+        if 'history' not in st.session_state:
+            st.session_state['history'] = []
         
-        if chain_mode == "CSV|Excel":
-            if paths is None:
-                st.sidebar.warning("Note: No CSV or Excel data uploaded. Provide atleast one data source")
-            llm_chain, llm = init_agent(model_name, temperature, csv=paths, chain_mode=chain_mode)
+        model_name, temperature, chain_mode = select_llm()
+        embeddings = load_embeddings(model_name)
+        files = get_csv_file()
+        paths, texts, chroma = None, None, None
 
-        elif chain_mode == 'Documents':
+        if chain_mode == 'Database':
             try:
-                assert chroma != None
-                llm_chain, llm = get_retrieval_chain(model_name, temperature, docsearch = chroma)
-            except AssertionError as e:
-                st.sidebar.warning('Upload at least one document')
+                if st.session_state['db_active']:
+                    llm_chain, llm = st.session_state['models']
+                else:
+                    llm_chain, llm = get_db_credentials(model_name=model_name, temperature=temperature,
+                                                    chain_mode=chain_mode)
+            except KeyError:
+                st.sidebar.warning('Provide a Database Log in Details')
                 llm_chain, llm = None, None
-            
-        
-    else:
-        if chain_mode == "CSV|Excel":
-            try: 
-                assert paths != None
-            except AssertionError as e:
-                st.sidebar.warning("Note: No CSV data uploaded. Upload at least one csv or excel file")
 
-        elif chain_mode == 'Documents':
-            try:
-                assert chroma != None
-            except AssertionError as e:
-                st.sidebar.warning('Upload at least one document or swith to data query')
+        elif files is not None:
+            for fp in files:
+                if fp[0] == 'csv':
+                    paths = fp[1]
+                elif fp[0] == 'docs':
+                    texts = fp[1]
+            if texts:
+                import openai
+                try:
+                    chroma = build_vectore_store(texts, embeddings)
+                except openai.error.AuthenticationError:
+                    st.echo('Invalid OPENAI API KEY')
+            
+            if chain_mode == "CSV|Excel":
+                if paths is None:
+                    st.sidebar.warning("Note: No CSV or Excel data uploaded. Provide atleast one data source")
+                llm_chain, llm = init_agent(model_name, temperature, csv=paths, chain_mode=chain_mode)
+
+            elif chain_mode == 'Documents':
+                try:
+                    assert chroma != None
+                    llm_chain, llm = get_retrieval_chain(model_name, temperature, docsearch = chroma)
+                except AssertionError as e:
+                    st.sidebar.warning('Upload at least one document')
+                    llm_chain, llm = None, None
                 
+            
+        else:
+            if chain_mode == "CSV|Excel":
+                try: 
+                    assert paths != None
+                except AssertionError as e:
+                    st.sidebar.warning("Note: No CSV data uploaded. Upload at least one csv or excel file")
+
+            elif chain_mode == 'Documents':
+                try:
+                    assert chroma != None
+                except AssertionError as e:
+                    st.sidebar.warning('Upload at least one document or swith to data query')
+                    
         
 
         init_messages()
@@ -472,13 +472,12 @@ def main() -> None:
         st.sidebar.markdown(f"**Total cost: ${sum(costs):.5f}**")
         for cost in costs:
             st.sidebar.markdown(f"- ${cost:.5f}")
+    except openai.error.AuthenticationError as e:
+        "Incorrect API key provided: sk-AqXgf***************************************8lPi. You can find your API key at https://platform.openai.com/account/api-keys"
+    except openai.error.RateLimitError:
+        st.warning('OpenAI RateLimit: Your API Key has probably exceeded the maximum requests per min or per day')
 
 
 # streamlit run app.py
 if __name__ == "__main__":
-    try:
-        main()
-    except openai.error.RateLimitError:
-        st.warning('OpenAI RateLimit: Your API Key has probably exceeded the maximum requests per min or per day')
-    except openai.error.AuthenticationError as e:
-        st.warning("Incorrect API key provided: sk-AqXgf***************************************8lPi. You can find your API key at https://platform.openai.com/account/api-keys")
+    main()
