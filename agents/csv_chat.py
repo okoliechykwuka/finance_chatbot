@@ -9,13 +9,13 @@ welcome_message = """Welcome to the Chainlit PDF QA demo! To get started:
 2. Ask a question about the file
 """
 
-def build_csv_agent(file_path, llm):
+def build_csv_agent(llm, file_path):
     assert isinstance(file_path, list)
     if len(file_path) == 1:
          file_path = file_path[0]
     
     csv_agent = create_csv_agent(
-        llm=llm,
+        llm,
         file_path,
         verbose=True,
         handle_parsing_errors=True,
