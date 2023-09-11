@@ -267,7 +267,7 @@ def init_agent(model_name: str, temperature: float, **kwargs) -> Union[ChatOpenA
         file_paths = kwargs['csv']
         if file_paths is not None:
             with st.spinner("Loading CSV FIle ..."):
-                llm_agent = build_csv_agent(file_path=file_paths, llm=llm)
+                llm_agent = build_csv_agent(llm, file_path=file_paths)
     
     return llm_agent, llm
 
