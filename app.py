@@ -1,13 +1,13 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+#__import__('pysqlite3')
+#import sys
+#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import langchain
 from agents.SQLagent import build_sql_agent, sql_as_tool
 from agents.csv_chat import build_csv_agent, csv_as_tool
 from utils.utility import ExcelLoader
 # app.py
 from typing import List, Union, Optional
-from langchain.document_loaders import PyPDFLoader, TextLoader
+from langchain.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
@@ -92,7 +92,7 @@ def get_csv_file() -> Optional[str]:
     
     uploaded_files = st.file_uploader(
         label="Here, upload your documents you want AskMAY to use to answer",
-        type= ["csv", 'xlsx', 'pdf','docs','txt'],
+        type= ["csv", 'xlsx', 'pdf','docx','txt'],
         accept_multiple_files= True
     )
 
@@ -107,6 +107,9 @@ def get_csv_file() -> Optional[str]:
                 Loader = TextLoader
             elif file.type == "application/pdf":
                 Loader = PyPDFLoader
+            elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                Loader = Docx2txtLoader
+
             elif file.type == "text/csv":
                 flp = './temp.csv'
                 pd.read_csv(file).to_csv(flp, index=False)
@@ -119,6 +122,8 @@ def get_csv_file() -> Optional[str]:
                 csv_paths.extend(paths)
 
             else:
+                print(file.type)
+                file.type
                 raise ValueError('File type is not supported')
 
             if Loader:
