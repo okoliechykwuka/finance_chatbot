@@ -29,7 +29,7 @@ Streamlit has been chosen as the front-end tool due to its simplicity and effici
 
 This chatbot document and data retrieval System simplifies and enhances the process of summarizing and retrieving information from company-specific knowledge sources while maintaining the context of the chat, ensuring accuracy and reliability in knowledge extraction.
 
-![Architecture_Diagram] (fin_app.png, "Diagram").
+![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/finapp.drawio.html)
 
 
 run in cmd
