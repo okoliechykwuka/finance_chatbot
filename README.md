@@ -33,7 +33,9 @@ This chatbot document and data retrieval System simplifies and enhances the proc
 
 
 run in cmd
-$pip install requirments.txt
+
+$pip install requirments.
+
 $streamlit run app.py
 
 
