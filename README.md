@@ -36,5 +36,10 @@ run in cmd
 $pip install requirments.txt
 $streamlit run app.py
 
+
+### FinApp Architecture
+
+
+
 https://chatbotforfinance.streamlit.app/
  
