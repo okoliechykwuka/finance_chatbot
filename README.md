@@ -31,15 +31,15 @@ This chatbot document and data retrieval System simplifies and enhances the proc
 
 ![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/finapp.drawio.png)
 
-
+### Steps to reproduce the code
+```
 run in cmd
 
-$pip install requirments.
+pip install requirments.
 
-$streamlit run app.py
+streamlit run app.py
+```
 
-
-### FinApp Architecture
 
 
 
