@@ -53,7 +53,7 @@ Next, we can start constructing the answer to a question/query of interest:
 
 
 
-We will build such a chatbot as an upcoming hands-on SwirlAI Newsletter series so stay tuned in!
+
 ![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/finapp.drawio.png)
 
 
