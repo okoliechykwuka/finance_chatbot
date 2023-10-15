@@ -27,6 +27,7 @@ pip-log.txt
 
 # Jupyter Notebook
 .ipynb_checkpoints
+exp.ipynb
 
 # Streamlit specific
 __pycache__/
@@ -36,3 +37,6 @@ __pycache__/
 #directories
 docs/
 temp/
+
+# files
+cost_of_living_us.csv

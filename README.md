@@ -43,5 +43,4 @@ streamlit run app.py
 
 
 
-https://chatbotforfinance.streamlit.app/
  

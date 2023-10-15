@@ -1,13 +1,13 @@
-# __import__('pysqlite3')
-# import sys
-# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+#__import__('pysqlite3')
+#import sys
+#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import langchain
 from agents.SQLagent import build_sql_agent, sql_as_tool
 from agents.csv_chat import build_csv_agent, csv_as_tool
 from utils.utility import ExcelLoader
 # app.py
 from typing import List, Union, Optional
-from langchain.document_loaders import PyPDFLoader, TextLoader
+from langchain.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chat_models import ChatOpenAI
@@ -92,7 +92,7 @@ def get_csv_file() -> Optional[str]:
     
     uploaded_files = st.file_uploader(
         label="Here, upload your documents you want AskMAY to use to answer",
-        type= ["csv", 'xlsx', 'pdf','docs','txt'],
+        type= ["csv", 'xlsx', 'pdf','docx','txt'],
         accept_multiple_files= True
     )
 
@@ -107,6 +107,9 @@ def get_csv_file() -> Optional[str]:
                 Loader = TextLoader
             elif file.type == "application/pdf":
                 Loader = PyPDFLoader
+            elif file.type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+                Loader = Docx2txtLoader
+
             elif file.type == "text/csv":
                 flp = './temp.csv'
                 pd.read_csv(file).to_csv(flp, index=False)
@@ -119,6 +122,8 @@ def get_csv_file() -> Optional[str]:
                 csv_paths.extend(paths)
 
             else:
+                print(file.type)
+                file.type
                 raise ValueError('File type is not supported')
 
             if Loader:
@@ -219,10 +224,13 @@ def select_llm() -> Union[ChatOpenAI, LlamaCpp]:
                                    ))
     temperature = st.sidebar.slider("Temperature:", min_value=0.0,
                                     max_value=1.0, value=0.0, step=0.01)
-
+    chain_mode = st.sidebar.selectbox(
+                        "What would you like to query?",
+                        ("Documents", "CSV|Excel", 'Database')
+    )
     #api_key  = st.sidebar.text_input('OPENAI API Key')
     
-    return model_name, temperature
+    return model_name, temperature, chain_mode,# api_key
 
 
 def init_agent(model_name: str, temperature: float, **kwargs) -> Union[ChatOpenAI, LlamaCpp]:
@@ -470,7 +478,7 @@ def main() -> None:
         for cost in costs:
             st.sidebar.markdown(f"- ${cost:.5f}")
     except openai.error.AuthenticationError as e:
-        "Incorrect API key provided: sk-AqXgf***************************************8lPi. You can find your API key at https://platform.openai.com/account/api-keys"
+        st.warning("Incorrect API key provided: You can find your API key at https://platform.openai.com/account/api-keys")
     except openai.error.RateLimitError:
         st.warning('OpenAI RateLimit: Your API Key has probably exceeded the maximum requests per min or per day')
 
