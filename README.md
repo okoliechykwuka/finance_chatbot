@@ -49,7 +49,7 @@ Next we can start constructing the answer to a question/query of interest:
 𝟳: Vector DB performs an Approximate Nearest Neighbour (ANN) search for the provided vector embedding against the index and returns previously chosen amount of context vectors. The procedure returns vectors that are most similar in a given Embedding/Latent space. 
 𝟴: Map the returned Vector Embeddings to the text chunks that represent them.
 𝟵: Pass a question together with the retrieved context text chunks to the LLM via prompt. Instruct the LLM to only use the provided context to answer the given question. This does not mean that no Prompt Engineering will be needed - you will want to ensure that the answers returned by LLM fall into expected boundaries, e.g. if there is no data in the retrieved context that could be used make sure that no made up answer is provided.
-![Document retreiver](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/lll_chatbot flowchart.jpeg)
+![Document retreiver](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/lll_chatbot%20flowchart.jpeg)
 
 
 
