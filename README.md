@@ -37,9 +37,9 @@ Let’s find out.
 
 The first step is to store the knowledge of your internal documents(PDF, DOC, .TXT) in a format that is suitable for querying. We do so by embedding it using an embedding model.
 
-𝟭.  We Split the text corpus of the entire knowledge base into chunks - a chunk will represent a single piece of context available to be queried. Data of interest can be from multiple sources, e.g. Documentation in Confluence supplemented by PDF reports.
+1. We Split the text corpus of the entire knowledge base into chunks - a chunk will represent a single piece of context available to be queried. Data of interest can be from multiple sources, e.g. Documentation in Confluence supplemented by PDF reports.
 
-𝟮.  Use the Embedding Model to transform each of the chunks into a vector embedding.
+2. Use the Embedding Model to transform each of the chunks into a vector embedding.
 
 𝟯.  Store all vector embeddings in a Vector Database(Chroma, Pinecone, Faiss, etc).
 
