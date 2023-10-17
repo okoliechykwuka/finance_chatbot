@@ -41,21 +41,21 @@ The first step is to store the knowledge of your internal documents(PDF, DOC, .T
 
 2. Use the Embedding Model to transform each of the chunks into a vector embedding.
 
-𝟯.  Store all vector embeddings in a Vector Database(Chroma, Pinecone, Faiss, etc).
+3. Store all vector embeddings in a Vector Database(Chroma, Pinecone, Faiss, etc).
 
-𝟰.  Save text that represents each of the embeddings separately together with the pointer to the embedding (we will need this later).
+4. Save text that represents each of the embeddings separately together with the pointer to the embedding (we will need this later).
 
 Next, we can start constructing the answer to a question/query of interest:
 
-𝟱.  Embed a question/query you want to ask using the same Embedding Model that was used to embed the knowledge base itself.
+5. Embed a question/query you want to ask using the same Embedding Model that was used to embed the knowledge base itself.
 
-𝟲.  Use the resulting Vector Embedding to run a query against the index in the Vector Database. Choose how many vectors you want to retrieve from the Vector Database - it will equal the amount of context you will be retrieving and eventually using for answering the query question.
+6. Use the resulting Vector Embedding to run a query against the index in the Vector Database. Choose how many vectors you want to retrieve from the Vector Database - it will equal the amount of context you will be retrieving and eventually using for answering the query question.
 
-𝟳.  Vector DB performs an Approximate Nearest Neighbour (ANN) search for the provided vector embedding against the index and returns a previously chosen amount of context vectors. The procedure returns vectors that are most similar in a given Embedding/Latent space. 
+7. Vector DB performs an Approximate Nearest Neighbour (ANN) search for the provided vector embedding against the index and returns a previously chosen amount of context vectors. The procedure returns vectors that are most similar in a given Embedding/Latent space. 
 
-𝟴.  Map the returned Vector Embeddings to the text chunks that represent them.
+8. Map the returned Vector Embeddings to the text chunks that represent them.
 
-𝟵.  Pass a question together with the retrieved context text chunks to the LLM via prompt. Instruct the LLM to only use the provided context to answer the given question. This does not mean that no Prompt Engineering will be needed-
+9. Pass a question together with the retrieved context text chunks to the LLM via prompt. Instruct the LLM to only use the provided context to answer the given question. This does not mean that no Prompt Engineering will be needed-
 
 you will want to ensure that the answers returned by LLM fall into expected boundaries, e.g. if there is no data in the retrieved context that could be used make sure that no made-up answer is provided.
 
