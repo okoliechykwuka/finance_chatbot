@@ -29,6 +29,8 @@ Streamlit has been chosen as the front-end tool due to its simplicity and effici
 
 This chatbot document and data retrieval System simplifies and enhances the process of summarizing and retrieving information from company-specific knowledge sources while maintaining the context of the chat, ensuring accuracy and reliability in knowledge extraction.
 
+![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/finapp.drawio.png)
+
 
 ## Breakdown of The Chatbot Retrieval System for the Document(PDF, DOC, .TXT)
 How do you build a 𝗟𝗟𝗠 𝗯𝗮𝘀𝗲𝗱 𝗖𝗵𝗮𝘁𝗯𝗼𝘁 𝘁𝗼 𝗾𝘂𝗲𝗿𝘆 𝘆𝗼𝘂𝗿 𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗞𝗻𝗼𝘄𝗹𝗲𝗱𝗴𝗲 𝗕𝗮𝘀𝗲?
@@ -60,11 +62,6 @@ Next, we can start constructing the answer to a question/query of interest:
 you will want to ensure that the answers returned by LLM fall into expected boundaries, e.g. if there is no data in the retrieved context that could be used make sure that no made-up answer is provided.
 
 ![Document retreiver](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/lll_chatbot%20flowchart.jpeg)
-
-
-
-
-![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/finapp.drawio.png)
 
 
 ## Breakdown of CSV Agent and SQL Agents
