@@ -1,0 +1,49 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      - DATABASE_USER=${DB_USER}
+      - DATABASE_PASSWORD=${DB_PASSWORD}
+      - DATABASE_HOST=${DB_HOST}
+      - DATABASE_NAME=${DB_NAME}
+    depends_on:
+      - postgres-db
+      - mysql-db
+    networks:
+      - mynetwork  # Define the network for the 'app' service
+
+  postgres-db:
+    image: postgres:latest  # Use the official PostgreSQL image
+    container_name: "postgres"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"  # PostgreSQL default port
+    networks:
+      - mynetwork  # Define the network for the 'postgres-db' service
+      
+  mysql-db:
+    image: mysql:latest  # Use the official MySQL image
+    container_name: "mysql"
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3307:3307"  # MySQL default port
+    networks:
+      - mynetwork  # Define the network for the 'mysql-db' service
+
+networks:
+  mynetwork:  # Define the 'mynetwork' network
+
+
+
+
