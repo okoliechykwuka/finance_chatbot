@@ -6,7 +6,6 @@ from langchain.agents import create_sql_agent
 from langchain.agents.agent_toolkits import SQLDatabaseToolkit 
 from langchain.sql_database import SQLDatabase 
 
-os.environ["LANGCHAIN_TRACING"] = "true"
 
 def postgres_uri(username, password, host, port, database):
     try:
@@ -19,15 +18,49 @@ def postgres_uri(username, password, host, port, database):
         raise ValueError("Check all credential")
     port = int(port)
     
-    pg_uri = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
+    os.environ["DB_USER"] = username
+    os.environ["DB_PASSWORD"] = password
+    os.environ["DB_HOST"] = host
+    os.environ["DB_NAME"] = database
+    
+    # db = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
+    db  = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
 
-    return pg_uri
+    return db
+
+def mysql_uri(username, password, host, port, database):
+    try:
+        assert username != None
+        assert password != None
+        assert host != None
+        assert port != None
+        assert database != None
+    except:
+        raise ValueError("Check all credential")
+    port = int(port)
+    # Set environment variables with user-entered values
+    
+    os.environ["DB_USER"] = username
+    os.environ["DB_PASSWORD"] = password
+    os.environ["DB_HOST"] = host
+    os.environ["DB_NAME"] = database
+    
+    db = f"mysql+pymysql://{username}:{password}@{host}/{database}"
+    
+    return db
 
 
 def build_sql_agent(llm,rdbs, **kwargs):
     #llm = OpenAI(temperature=0,model="text-davinci-003", streaming=True)
+    print(rdbs.lower())
+    print('----------------------------------------------------------------')
     if rdbs.lower() == 'postgres':
         uri = postgres_uri(**kwargs)
+    elif rdbs.lower() == 'mysql':
+        print(rdbs.lower())
+        uri = mysql_uri(**kwargs)
+    else:
+        print('database not connected yet')
     
     db = SQLDatabase.from_uri(uri)
     toolkit = SQLDatabaseToolkit(db=db, llm=llm)

@@ -1,9 +1,8 @@
-#__import__('pysqlite3')
-#import sys
-#sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
-import langchain
-from agents.SQLagent import build_sql_agent, sql_as_tool
-from agents.csv_chat import build_csv_agent, csv_as_tool
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+from agents.SQLagent import build_sql_agent
+from agents.csv_chat import build_csv_agent
 from utils.utility import ExcelLoader
 # app.py
 from typing import List, Union, Optional
@@ -146,50 +145,56 @@ def get_csv_file() -> Optional[str]:
         return None
 def get_db_credentials(model_name, temperature, chain_mode='Database'):
     """
-    creates a form for user to input database login credentials
+    creates a form for the user to input database login credentials
     """
 
-    username = None
-    host = None
-    port = None
-    db = None
-    password = None
-    import time
-    pholder = st.empty()
-    with pholder.form('Database_Login'):
-        st.write("Enter Database Credentials ")
-        username = st.text_input('Username').strip()
-        password = st.text_input('Password', type='password',).strip()
-        rdbs = st.selectbox('Select RDBS:',
-                            ("Postgres",
-                            'MS SQL Server/Azure SQL',
-                            "MySQL",
-                            "Oracle")
-                        )
-        port = st.number_input('Port')
-        host = st.text_input('Hostname').strip()
-        db = st.text_input('Database name').strip()
+    # Check if the form has already been submitted
+    if 'db_form_submitted' not in st.session_state:
+        username = None
+        host = None
+        port = None
+        db = None
+        password = None
+        import time
+        pholder = st.empty()
+        with pholder.form('Database_Login'):
+            st.write("Enter Database Credentials ")
+            username = st.text_input('Username').strip()
+            password = st.text_input('Password', type='password',).strip()
+            rdbs = st.selectbox('Select RDBS:',
+                                ("Postgres",
+                                'MS SQL Server/Azure SQL',
+                                "MySQL",
+                                "Oracle")
+                            )
+            port = st.number_input('Port')
+            host = st.text_input('Hostname').strip()
+            db = st.text_input('Database name').strip()
 
-        submitted = st.form_submit_button('Submit')
-        if submitted:
-            with st.spinner("Logging into database..."):
-                
-                llm_chain, llm = init_agent(model_name=model_name,
-                                    temperature=temperature,
-                                    rdbs = rdbs,
-                                    username=username,
-                                    password=password,
-                                    port=port,
-                                    host=host,
-                                    database=db,
-                                    chain_mode = chain_mode)
-                st.session_state['models'] = (llm_chain, llm)
-            st.success("Login Success")
-            st.session_state['db_active'] = True
-            time.sleep(1)
-            pholder.empty()
-    
-    return st.session_state['models']
+            submitted = st.form_submit_button('Submit')
+            if submitted:
+                with st.spinner("Logging into the database..."):
+                    
+                    llm_chain, llm = init_agent(model_name=model_name,
+                                        temperature=temperature,
+                                        rdbs=rdbs,
+                                        username=username,
+                                        password=password,
+                                        port=port,
+                                        host=host,
+                                        database=db,
+                                        chain_mode=chain_mode)
+                    st.session_state['models'] = (llm_chain, llm)
+                st.success("Login Success")
+                st.session_state['db_form_submitted'] = True  # Set the session variable to indicate the form has been submitted
+                time.sleep(1)
+                pholder.empty()
+
+        return st.session_state['models']
+
+    # If the form has already been submitted, return the stored models
+    return st.session_state.get('models', None)
+
 
 def build_vectore_store(
     docs: str, embeddings: Union[OpenAIEmbeddings, LlamaCppEmbeddings]) \
@@ -265,7 +270,9 @@ def init_agent(model_name: str, temperature: float, **kwargs) -> Union[ChatOpenA
         host = kwargs['host']
         port = kwargs['port']
         database = kwargs['database']
-
+        print('----------------------------------------------------------------')
+        st.write(print(rdbs,username,password,host,port,database ))
+        print(rdbs,username,password,host,port,database )
         llm_agent = build_sql_agent(llm=llm, rdbs=rdbs, username=username, password=password,
                                     host=host, port=port, database=database)
     if chain_mode == 'CSV|Excel':
