@@ -83,20 +83,28 @@ The function works by loading the CSV file into a dataframe and using a pandas a
 ```
 run in cmd
 
-pip  -r install requirements.txt.
+pip install -r requirements.txt.
 
 streamlit run app.py
 ```
 
 ### Steps to run the app via docker
 
-1. pull docker image from the hub  `docker pull chukypedro15/chatbot:tag`
+1. pull docker image from the hub  `docker pull chukypedro15/finchat:1.0`
 
-2. Run  `docker run -p 8501:8501 finchat` and navigate to `http://localhost:8501`
+2. Run  `docker run -d -p 8501:8501 finance_chatbot-app` and navigate to `http://localhost:8501`
 
 3. You can navigate to the localhost endpoint and interact with the application.
 
+4. User `host.docker.internal` as the database Host in the streamlit UserInterface
 
 
+```
+FFFF   IIIII  N   N    A    N   N   CCC   EEEE         CCC   H   H    A    TTTTT  BBBB    OOO   TTTTT  
+F        I    NN  N   A A   NN  N  C   C  E           C   C  H   H   A A     T    B   B  O   O    T    
+FFF      I    N N N  AAAAA  N N N  C      EEE         C      HHHHH  AAAAA    T    BBBB   O   O    T    
+F        I    N  NN  A   A  N  NN  C   C  E           C   C  H   H  A   A    T    B   B  O   O    T    
+F      IIIII  N   N  A   A  N   N   CCC   EEEE         CCC   H   H  A   A    T    BBBB    OOO     T  
 
+```
  
