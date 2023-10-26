@@ -90,7 +90,7 @@ streamlit run app.py
 
 ### Steps to run the app via docker
 
-1. pull docker image from the hub  `docker pull chukypedro15/finchat:1.0`
+1. pull docker image from the hub  `docker pull chukypedro15/finchat:1.0`   https://hub.docker.com/repository/docker/chukypedro15/finchat/general
 
 2. Run  `docker run -d -p 8501:8501 finance_chatbot-app` and navigate to `http://localhost:8501`
 
