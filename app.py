@@ -196,7 +196,7 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
     return st.session_state.get('models', None)
 
 
-def build_vectore_store(
+def build_vector_store(
     docs: str, embeddings: Union[OpenAIEmbeddings, LlamaCppEmbeddings]) \
         -> Optional[Qdrant]:
     """
@@ -409,7 +409,7 @@ def main() -> None:
             if texts:
                 import openai
                 try:
-                    chroma = build_vectore_store(texts, embeddings)
+                    chroma = build_vector_store(texts, embeddings)
                 except openai.error.AuthenticationError:
                     st.echo('Invalid OPENAI API KEY')
             
@@ -445,6 +445,7 @@ def main() -> None:
         init_messages()
 
         # Supervise user input
+        st.header("Personal FinanceGPT")
         if user_input := st.chat_input("Input your question!"):
             try:
                 assert type(llm_chain) != type(None)
@@ -461,8 +462,8 @@ def main() -> None:
                     user_input_w_context = user_input
                 st.session_state.messages.append(
                     HumanMessage(content=user_input_w_context))
+                answer, cost = get_answer(llm_chain,llm, user_input)
                 with st.spinner("Assistant is typing ..."):
-                    answer, cost = get_answer(llm_chain,llm, user_input)
                     st.write(answer)
                 st.session_state.messages.append(AIMessage(content=answer))
                 st.session_state.costs.append(cost)
