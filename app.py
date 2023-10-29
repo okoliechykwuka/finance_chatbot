@@ -143,14 +143,16 @@ def get_csv_file() -> Optional[str]:
         return all_files
     else:
         return None
-@st.cache
+    
 def get_db_credentials(model_name, temperature, chain_mode='Database'):
     """
     creates a form for the user to input database login credentials
     """
 
     # Check if the form has already been submitted
-    if 'db_form_submitted' not in st.session_state:
+    try:
+        db_active = os.environ['DB_ACTIVE']
+    except KeyError:
         username = None
         host = None
         port = None
@@ -158,6 +160,7 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
         password = None
         import time
         pholder = st.empty()
+        
         with pholder.form('Database_Login'):
             st.write("Enter Database Credentials ")
             username = st.text_input('Username').strip()
@@ -172,7 +175,8 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
             host = st.text_input('Hostname').strip()
             db = st.text_input('Database name').strip()
 
-        submitted = st.form_submit_button('Submit')
+            submitted = st.form_submit_button('Submit')
+
         if submitted:
             with st.spinner("Logging into database..."):
                 
@@ -185,18 +189,22 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
                                     host=host,
                                     database=db,
                                     chain_mode = chain_mode)
-                st.session_state['models'] = (llm_chain, llm)
+            st.session_state['models'] = (llm_chain, llm)
             st.success("Login Success")
+            os.environ['DB_ACTIVE'] = "true"
+            db_active = os.environ['DB_ACTIVE']
             st.session_state['db_active'] = True
-            time.sleep(1)
+            time.sleep(2)
             pholder.empty()
-    
-    return st.session_state['models']
 
-    # If the form has already been submitted, return the stored models
-    return st.session_state.get('models', None)
+            # If the form has already been submitted, return the stored models
+        if db_active == "true":
+            return st.session_state['models']
+        else:
+            st.stop()
 
 
+@st.cache
 def build_vector_store(
     docs: str, embeddings: Union[OpenAIEmbeddings, LlamaCppEmbeddings]) \
         -> Optional[Qdrant]:
@@ -324,6 +332,7 @@ def get_answer(llm_chain,llm, message) -> tuple[str, float]:
     """
     Get the AI answer to user questions.
     """
+    import langchain
 
     if isinstance(llm, (ChatOpenAI, OpenAI)):
         with get_openai_callback() as cb:
@@ -333,7 +342,7 @@ def get_answer(llm_chain,llm, message) -> tuple[str, float]:
                     answer =  str(response['answer'])# + "\n\nSOURCES: " + str(response['sources'])
                 else:
                     answer = llm_chain.run(message)
-            except ValueError as e:
+            except langchain.schema.output_parser.OutputParserException as e:
                 response = str(e)
                 if not response.startswith("Could not parse tool input: "):
                     raise e
@@ -392,7 +401,7 @@ def main() -> None:
 
         if chain_mode == 'Database':
             try:
-                if st.session_state['db_active']:
+                if os.environ['DB_ACTIVE']:
                     llm_chain, llm = st.session_state['models']
                 else:
                     llm_chain, llm = get_db_credentials(model_name=model_name, temperature=temperature,
@@ -447,7 +456,12 @@ def main() -> None:
 
         # Supervise user input
         st.header("Personal FinanceGPT")
-        if user_input := st.chat_input("Input your question!"):
+        container = st.container()
+        with container:
+            tab = st.tabs(['Tab1'])
+            user_input = st.chat_input("Input your question!")
+            
+        if user_input:
             try:
                 assert type(llm_chain) != type(None)
                 if chroma:
@@ -463,9 +477,12 @@ def main() -> None:
                     user_input_w_context = user_input
                 st.session_state.messages.append(
                     HumanMessage(content=user_input_w_context))
-                answer, cost = get_answer(llm_chain,llm, user_input)
-                with st.spinner("Assistant is typing ..."):
-                    st.write(answer)
+                
+                with container:
+                    with st.spinner("Assistant is typing ..."):
+                        answer, cost = get_answer(llm_chain,llm, user_input)
+                        st.write(answer)
+
                 st.session_state.messages.append(AIMessage(content=answer))
                 st.session_state.costs.append(cost)
             except AssertionError:
