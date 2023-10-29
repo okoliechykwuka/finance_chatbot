@@ -427,6 +427,11 @@ def main() -> None:
                                                     chain_mode=chain_mode)
             except KeyError:
                 st.sidebar.warning('Provide a Database Log in Details')
+                os.environ['DB_ACTIVE'] = "false"
+                llm_chain, llm = get_db_credentials(model_name=model_name, temperature=temperature,
+                                                    chain_mode=chain_mode)
+                
+                
                 
             except Exception as e:
                 err = str(e)
