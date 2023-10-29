@@ -29,27 +29,82 @@ Streamlit has been chosen as the front-end tool due to its simplicity and effici
 
 This chatbot document and data retrieval System simplifies and enhances the process of summarizing and retrieving information from company-specific knowledge sources while maintaining the context of the chat, ensuring accuracy and reliability in knowledge extraction.
 
-![Architecture_Diagram] (fin_app.png, "Diagram").
+![Architecture_Diagram](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/finapp.drawio.png)
 
 
-To run the APP
+## Breakdown of The Chatbot Retrieval System for the Document(PDF, DOC, .TXT)
+How do you build a 𝗟𝗟𝗠 𝗯𝗮𝘀𝗲𝗱 𝗖𝗵𝗮𝘁𝗯𝗼𝘁 𝘁𝗼 𝗾𝘂𝗲𝗿𝘆 𝘆𝗼𝘂𝗿 𝗣𝗿𝗶𝘃𝗮𝘁𝗲 𝗞𝗻𝗼𝘄𝗹𝗲𝗱𝗴𝗲 𝗕𝗮𝘀𝗲?
 
-run in cmd:\
+Let’s find out.
 
-```$pip install requirments.txt```
-```$streamlit run app.py```
+The first step is to store the knowledge of your internal documents(PDF, DOC, .TXT) in a format that is suitable for querying. We do so by embedding it using an embedding model.
+
+1. We Split the text corpus of the entire knowledge base into chunks - a chunk will represent a single piece of context available to be queried. Data of interest can be from multiple sources, e.g. Documentation in Confluence supplemented by PDF reports.
+
+2. Use the Embedding Model to transform each of the chunks into a vector embedding.
+
+3. Store all vector embeddings in a Vector Database(Chroma, Pinecone, Faiss, etc).
+
+4. Save text that represents each of the embeddings separately together with the pointer to the embedding (we will need this later).
+
+Next, we can start constructing the answer to a question/query of interest:
+
+5. Embed a question/query you want to ask using the same Embedding Model that was used to embed the knowledge base itself.
+
+6. Use the resulting Vector Embedding to run a query against the index in the Vector Database. Choose how many vectors you want to retrieve from the Vector Database - it will equal the amount of context you will be retrieving and eventually using for answering the query question.
+
+7. Vector DB performs an Approximate Nearest Neighbour (ANN) search for the provided vector embedding against the index and returns a previously chosen amount of context vectors. The procedure returns vectors that are most similar in a given Embedding/Latent space. 
+
+8. Map the returned Vector Embeddings to the text chunks that represent them.
+
+9. Pass a question together with the retrieved context text chunks to the LLM via prompt. Instruct the LLM to only use the provided context to answer the given question. This does not mean that no Prompt Engineering will be needed-
+
+you will want to ensure that the answers returned by LLM fall into expected boundaries, e.g. if there is no data in the retrieved context that could be used make sure that no made-up answer is provided.
+
+![Document retreiver](https://github.com/okoliechykwuka/finance_chatbot/blob/main/img/lll_chatbot%20flowchart.jpeg)
+
+
+## Breakdown of CSV Agent and SQL Agents
+
+**CSV Agent:** The `create_csv_agent` function in LangChain is used to create an agent that can interact with data in CSV format². It takes a few parameters:
+
+- `llm`: This is the BaseLanguageModel, which is the language model that will be used for generating responses.
+- `path`: This can be a string representing the path to the CSV file, an IOBase object, or a list of such items.
+- `pandas_kwargs`: This is an optional dictionary of arguments that will be passed to the pandas' read_csv function.
+- `**kwargs`: Any additional keyword arguments¹.
+
+The function works by loading the CSV file into a dataframe and using a pandas agent¹. It's mostly optimized for question answering². 
+
+
+**SQL Agent:** The create_sql_agent function in LangChain is used to create an agent that can interact with data in SQL databases. The function works by creating a more advanced SQL agent using the SQLDatabaseToolkit4. 
+               It’s mostly optimized for question-answering over your database
+
+### Steps to run the app via streamlit.
+```
+run in cmd
+
+pip install -r requirements.txt.
+
+streamlit run app.py
+```
+
+### Steps to run the app via docker
+
+1. pull docker image from the hub  `docker pull chukypedro15/finchat:1.0`   https://hub.docker.com/repository/docker/chukypedro15/finchat/general
+
+2. Run  `docker run -d -p 8501:8501 finance_chatbot-app` and navigate to `http://localhost:8501`
+
+3. You can navigate to the localhost endpoint and interact with the application.
+
+4. User `host.docker.internal` as the database Host in the streamlit UserInterface
+
+
+```
+FFFF   IIIII  N   N    A    N   N   CCC   EEEE         CCC   H   H    A    TTTTT  BBBB    OOO   TTTTT  
+F        I    NN  N   A A   NN  N  C   C  E           C   C  H   H   A A     T    B   B  O   O    T    
+FFF      I    N N N  AAAAA  N N N  C      EEE         C      HHHHH  AAAAA    T    BBBB   O   O    T    
+F        I    N  NN  A   A  N  NN  C   C  E           C   C  H   H  A   A    T    B   B  O   O    T    
+F      IIIII  N   N  A   A  N   N   CCC   EEEE         CCC   H   H  A   A    T    BBBB    OOO     T  
+
+```
  
- when the app loads it is hosted at localhost:8501. This may be different depending on the hosting machine or hosting cloud service. The first page requests you enter you OpenAI API Key
-
- ![OpenAI_API_KEY](img_api).
-
- The chat interface opens and you are can upload pdf, docx, txts, CSV, Excel, files and as well connect to a database from the interface. 
- On the left pane you can select the 
- 1. llm model you want to use
- 2. Model temperature which detemines the creativity of the model. This should be left to default unless you are sure you know what you are doing
- 3. Source: You can select where you want your prompt to be directed to either the database, documents or the csv and excel data
- 4. You can view the total cost you've incured using the OpenAI API Key
-
-* You can choose to upload the multiple documents and files all at once 
-* You can add new documents even in the middle of the conversation
-* You can only connect to one database at a time 
