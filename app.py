@@ -46,6 +46,7 @@ Question: [][][][]{question}[][][][]
 Answer:"""
 
 
+
 def open_ai_key():
     with st.sidebar:
         openai_api_key = st.text_input("OpenAI API Key", key="chatbot_api_key", type="password")
@@ -54,6 +55,10 @@ def open_ai_key():
             st.info("Please add your OpenAI API key to continue.")
             st.stop()
         os.environ["OPENAI_API_KEY"] = openai_api_key
+        
+@st.cache_data
+def dbActive():
+    os.environ['DB_ACTIVE'] = 'false'
 
 
 def init_page() -> None:
@@ -80,6 +85,8 @@ def init_messages() -> None:
             )
         ]
         st.session_state.costs = []
+
+
 
 def get_csv_file() -> Optional[str]:
     """
@@ -150,9 +157,14 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
     """
 
     # Check if the form has already been submitted
-    try:
-        db_active = os.environ['DB_ACTIVE']
-    except KeyError:
+    
+    db_active = os.environ['DB_ACTIVE']
+    if db_active == "true":
+        print(db_active)
+
+        return st.session_state['models']
+        
+    else:
         username = None
         host = None
         port = None
@@ -199,7 +211,10 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
 
             # If the form has already been submitted, return the stored models
         if db_active == "true":
-            return st.session_state['models']
+            #return st.session_state['models']
+            mds =  st.session_state['models']
+            st.write("Reached")
+            return mds
         else:
             st.stop()
 
@@ -279,9 +294,9 @@ def init_agent(model_name: str, temperature: float, **kwargs) -> Union[ChatOpenA
         host = kwargs['host']
         port = kwargs['port']
         database = kwargs['database']
-        print('----------------------------------------------------------------')
-        st.write(print(rdbs,username,password,host,port,database ))
-        print(rdbs,username,password,host,port,database )
+        #print('----------------------------------------------------------------')
+        #st.write(print(rdbs,username,password,host,port,database ))
+        #print(rdbs,username,password,host,port,database )
         llm_agent = build_sql_agent(llm=llm, rdbs=rdbs, username=username, password=password,
                                     host=host, port=port, database=database)
     if chain_mode == 'CSV|Excel':
@@ -389,6 +404,7 @@ def extract_userquesion_part_only(content):
 def main() -> None:
     import openai
     init_page()
+    dbActive()
     try:
         open_ai_key()
         if 'history' not in st.session_state:
@@ -400,15 +416,22 @@ def main() -> None:
         paths, texts, chroma = None, None, None
 
         if chain_mode == 'Database':
+            llm_chain, llm = None, None
             try:
-                if os.environ['DB_ACTIVE']:
+                print(os.environ['DB_ACTIVE'])
+                if os.environ['DB_ACTIVE'] == "true":
                     llm_chain, llm = st.session_state['models']
+                    
                 else:
                     llm_chain, llm = get_db_credentials(model_name=model_name, temperature=temperature,
                                                     chain_mode=chain_mode)
             except KeyError:
                 st.sidebar.warning('Provide a Database Log in Details')
-                llm_chain, llm = None, None
+                
+            except Exception as e:
+                err = str(e)
+                st.error(err)
+                
 
         elif files is not None:
             for fp in files:
@@ -458,7 +481,7 @@ def main() -> None:
         st.header("Personal FinanceGPT")
         container = st.container()
         with container:
-            tab = st.tabs(['Tab1'])
+            
             user_input = st.chat_input("Input your question!")
             
         if user_input:
@@ -478,10 +501,10 @@ def main() -> None:
                 st.session_state.messages.append(
                     HumanMessage(content=user_input_w_context))
                 
-                with container:
-                    with st.spinner("Assistant is typing ..."):
-                        answer, cost = get_answer(llm_chain,llm, user_input)
-                        st.write(answer)
+                
+                with st.spinner("Assistant is typing ..."):
+                    answer, cost = get_answer(llm_chain,llm, user_input)
+                    st.write(answer)
 
                 st.session_state.messages.append(AIMessage(content=answer))
                 st.session_state.costs.append(cost)
