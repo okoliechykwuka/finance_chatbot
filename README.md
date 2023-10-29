@@ -32,7 +32,24 @@ This chatbot document and data retrieval System simplifies and enhances the proc
 ![Architecture_Diagram] (fin_app.png, "Diagram").
 
 
-run in cmd
-$pip install requirments.txt
-$streamlit run app.py
+To run the APP
+
+run in cmd:\
+
+```$pip install requirments.txt```
+```$streamlit run app.py```
  
+ when the app loads it is hosted at localhost:8501. This may be different depending on the hosting machine or hosting cloud service. The first page requests you enter you OpenAI API Key
+
+ ![OpenAI_API_KEY](img_api).
+
+ The chat interface opens and you are can upload pdf, docx, txts, CSV, Excel, files and as well connect to a database from the interface. 
+ On the left pane you can select the 
+ 1. llm model you want to use
+ 2. Model temperature which detemines the creativity of the model. This should be left to default unless you are sure you know what you are doing
+ 3. Source: You can select where you want your prompt to be directed to either the database, documents or the csv and excel data
+ 4. You can view the total cost you've incured using the OpenAI API Key
+
+* You can choose to upload the multiple documents and files all at once 
+* You can add new documents even in the middle of the conversation
+* You can only connect to one database at a time 

@@ -144,6 +144,7 @@ def get_csv_file() -> Optional[str]:
         return all_files
     else:
         return None
+@st.cache
 def get_db_credentials(model_name, temperature, chain_mode='Database'):
     """
     creates a form for user to input database login credentials
@@ -170,8 +171,12 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
         host = st.text_input('Hostname').strip()
         db = st.text_input('Database name').strip()
 
+        
+
+
         submitted = st.form_submit_button('Submit')
         if submitted:
+            
             with st.spinner("Logging into database..."):
                 
                 llm_chain, llm = init_agent(model_name=model_name,
