@@ -98,7 +98,7 @@ def get_csv_file() -> Optional[str]:
     
     uploaded_files = st.file_uploader(
         label="Here, upload your documents you want AskMAY to use to answer",
-        type= ["csv", 'xlsx', 'pdf','docx','txt'],
+        type= ["csv", 'xlsx', 'pdf','docx'],
         accept_multiple_files= True
     )
 
@@ -219,7 +219,6 @@ def get_db_credentials(model_name, temperature, chain_mode='Database'):
             st.stop()
 
 
-@st.cache
 def build_vector_store(
     docs: str, embeddings: Union[OpenAIEmbeddings, LlamaCppEmbeddings]) \
         -> Optional[Qdrant]:
